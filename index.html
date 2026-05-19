@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>爆品素材 PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* 底色：奶霧米 / 淺杏 */
+  --bg:#F5F2EC;
+  --surface:#FBFAF6;
+  --surface2:#EFEBE3;
+  /* 邊框：淺岩石灰 */
+  --border:#DDD7CB;
+  --border2:#C9C2B4;
+  /* 文字：深灰咖 */
+  --text:#3D3935;
+  --text2:#6E6863;
+  --text3:#9C958C;
+  /* 主色：莫蘭迪暖陶 */
+  --accent:#B98E72;
+  --accent-glow:rgba(185,142,114,0.18);
+  /* 副色：莫蘭迪鼠尾草 / 灰藍 / 紫煙 / 卡其 / 青灰 / 磚紅 */
+  --green:#9DAA94;
+  --green-glow:rgba(157,170,148,0.18);
+  --blue:#92A4B5;
+  --blue-glow:rgba(146,164,181,0.18);
+  --purple:#A89CB5;
+  --purple-glow:rgba(168,156,181,0.18);
+  --gold:#C4A878;
+  --gold-glow:rgba(196,168,120,0.18);
+  --teal:#8FAEAC;
+  --teal-glow:rgba(143,174,172,0.18);
+  --danger:#C18A87;
+  --danger-glow:rgba(193,138,135,0.18);
+  --radius:10px;--radius-lg:16px;
+  --shadow:0 1px 2px rgba(80,70,60,0.04),0 4px 12px rgba(80,70,60,0.06)
+}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+
+/* === 登入 === */
+.login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px 36px;width:100%;max-width:400px;box-shadow:var(--shadow);text-align:center}
+.login-logo{width:56px;height:56px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:white;margin:0 auto 16px;box-shadow:0 4px 12px var(--accent-glow)}
+.login-title{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:0.02em}
+.login-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--accent-glow);color:var(--accent);margin-bottom:24px;letter-spacing:0.08em}
+.login-box input{font-size:14px;padding:12px 14px;text-align:center;letter-spacing:0.05em;margin-bottom:12px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);width:100%;font-family:inherit;outline:none;transition:border-color 0.15s}
+.login-box input:focus{border-color:var(--accent)}
+.login-btn{width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.15s}
+.login-btn:hover{opacity:0.88}
+.login-err{font-size:12px;color:var(--danger);margin-top:10px;min-height:18px}
+
+/* === App === */
+.app{display:none;flex-direction:column;width:100%;min-height:100vh}
+.app.show{display:flex}
+
+/* === Topbar === */
+.topbar{width:100%;background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;height:60px}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.logo-mark{width:36px;height:36px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:white}
+.topbar-title{font-size:15px;font-weight:600}
+.topbar-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;background:var(--accent-glow);color:var(--accent);margin-left:6px;vertical-align:middle;letter-spacing:0.08em}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.credits-display{display:flex;align-items:center;gap:6px;font-size:12px;background:var(--surface2);padding:6px 12px;border-radius:20px;border:1px solid var(--border)}
+.credits-icon{color:var(--gold)}
+.credits-num{font-weight:600;color:var(--gold);font-family:'DM Mono',monospace}
+.topup-btn{font-size:11px;padding:5px 12px;border:1px solid var(--border2);border-radius:20px;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.topup-btn:hover{border-color:var(--gold);color:var(--gold)}
+.logout-btn{font-size:11px;padding:5px 12px;border:1px solid var(--border2);border-radius:20px;background:transparent;color:var(--text3);cursor:pointer;font-family:inherit}
+.logout-btn:hover{color:var(--text2);border-color:var(--border)}
+
+/* === Main === */
+.main{display:grid;grid-template-columns:380px 1fr;width:100%;flex:1;min-height:calc(100vh - 60px)}
+
+/* === Sidebar === */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 20px;overflow-y:auto;height:calc(100vh - 60px);position:sticky;top:60px}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+.section-label{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.sidebar-section{margin-bottom:22px}
+input,select,textarea{width:100%;font-family:'Noto Sans TC',sans-serif;font-size:13px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);outline:none;transition:border-color 0.15s;line-height:1.5}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--text3);font-size:12px}
+textarea{resize:vertical;min-height:80px}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236E6863' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
+
+.hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.6}
+
+/* === 參考圖上傳 === */
+.refimg-wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.refimg-slot{aspect-ratio:1;background:var(--bg);border:1px dashed var(--border2);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.15s}
+.refimg-slot:hover{border-color:var(--accent)}
+.refimg-slot.filled{border-style:solid;border-color:var(--border)}
+.refimg-slot img{width:100%;height:100%;object-fit:cover}
+.refimg-slot-plus{font-size:20px;color:var(--text3);font-weight:300}
+.refimg-slot-remove{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(61,57,53,0.65);color:white;border:none;cursor:pointer;font-size:10px;display:none;align-items:center;justify-content:center;padding:0}
+.refimg-slot.filled .refimg-slot-remove{display:flex}
+
+/* === Gen 按鈕 === */
+.gen-btn{width:100%;padding:14px;background:var(--accent);color:white;border:none;border-radius:var(--radius);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.15s,transform 0.1s;margin-top:8px;box-shadow:0 2px 8px var(--accent-glow);letter-spacing:0.04em}
+.gen-btn:hover{opacity:0.92}
+.gen-btn:active{transform:translateY(1px)}
+.gen-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.gen-cost{text-align:center;font-size:11px;color:var(--text3);margin-top:8px}
+
+/* === Output === */
+.output-col{padding:28px 32px;overflow-y:auto;height:calc(100vh - 60px)}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:500px;text-align:center;gap:12px;padding:40px}
+.empty-icon{font-size:48px;opacity:0.4}
+.empty-title{font-size:16px;font-weight:500;color:var(--text2)}
+.empty-sub{font-size:13px;color:var(--text3);line-height:1.8;max-width:400px}
+
+/* === 進度顯示 === */
+.progress-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:18px;padding:40px}
+.progress-spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress-title{font-size:15px;font-weight:600}
+.progress-step{font-size:13px;color:var(--text2);min-height:20px}
+.progress-bar{width:300px;max-width:80%;height:6px;background:var(--surface2);border-radius:10px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;background:var(--accent);transition:width 0.5s;border-radius:10px}
+.progress-elapsed{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:8px}
+
+/* === 結果區 === */
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.result-title{font-size:20px;font-weight:600}
+.result-meta{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:3px}
+.zip-btn{font-size:13px;padding:9px 18px;background:var(--accent);color:white;border:none;border-radius:var(--radius);font-family:inherit;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.zip-btn:hover{opacity:0.9}
+.zip-btn:disabled{opacity:0.5;cursor:not-allowed}
+
+/* === Result sections === */
+.r-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:20px;overflow:hidden}
+.r-section-head{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--surface2)}
+.r-section-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.r-section-icon{font-size:18px}
+.r-section-body{padding:18px 20px}
+.r-section-copy{font-size:11px;padding:5px 12px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:20px;cursor:pointer;font-family:inherit}
+.r-section-copy:hover{color:var(--text);border-color:var(--text2)}
+
+/* === 商品分析摘要 === */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.summary-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.summary-item-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:4px}
+.summary-item-value{font-size:13px;color:var(--text);line-height:1.6}
+
+/* === 影片腳本 === */
+.video-script{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.video-script-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.video-script-title{font-size:14px;font-weight:600;color:var(--accent)}
+.video-script-meta{font-size:11px;color:var(--text3)}
+.video-info-row{margin:5px 0;font-size:12px;line-height:1.7}
+.video-info-row b{color:var(--accent);font-weight:600;margin-right:5px}
+.scene-list{margin-top:10px}
+.scene-card{background:var(--surface2);border-left:3px solid var(--accent);border-radius:6px;padding:10px 12px;margin:8px 0}
+.scene-card-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px}
+.scene-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);background:var(--bg);padding:1px 6px;border-radius:4px;margin-right:6px}
+.scene-field{font-size:12px;line-height:1.7;margin:3px 0;color:var(--text)}
+.scene-field b{color:var(--text2);font-weight:600;margin-right:4px}
+.jimeng-prompt{background:#F0EBE0;border:1px solid var(--border2);border-radius:6px;padding:10px 12px;margin-top:6px;font-family:'DM Mono',monospace;font-size:11px;color:#6B5A45;line-height:1.6;white-space:pre-wrap;word-break:break-word;position:relative}
+.jimeng-copy{position:absolute;top:6px;right:6px;font-size:10px;padding:2px 8px;background:transparent;color:#8A7458;border:1px solid #8A7458;border-radius:12px;cursor:pointer;font-family:inherit;opacity:0.8}
+.jimeng-copy:hover{opacity:1}
+
+/* === 圖片 8 張 grid === */
+.imggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.imgcell{background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;aspect-ratio:1;position:relative;cursor:pointer;transition:transform 0.15s,border-color 0.15s}
+.imgcell:hover{border-color:var(--accent);transform:translateY(-2px)}
+.imgcell img{width:100%;height:100%;object-fit:cover}
+.imgcell-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(61,57,53,0.72));color:white;font-size:10px;padding:18px 8px 6px;font-weight:500;line-height:1.3}
+.imgcell-num{position:absolute;top:6px;left:6px;background:rgba(61,57,53,0.65);color:white;font-size:10px;width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-weight:600}
+.imgcell-loading{display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;flex-direction:column;gap:6px;height:100%}
+.imgcell-loading .progress-spinner{width:20px;height:20px;border-width:2px}
+.imgcell-error{display:flex;align-items:center;justify-content:center;color:var(--danger);font-size:11px;flex-direction:column;gap:6px;text-align:center;padding:12px;height:100%}
+
+/* === 文字內容 === */
+.text-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.text-block-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:6px}
+.text-block-content{font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap}
+.tag-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.tag-pill{display:inline-block;background:var(--purple-glow);color:var(--purple);border:1px solid var(--purple);border-radius:14px;padding:2px 9px;font-size:11px}
+
+/* === Modal (大圖預覽) === */
+.modal{display:none;position:fixed;inset:0;background:rgba(61,57,53,0.78);backdrop-filter:blur(6px);z-index:9000;align-items:center;justify-content:center;padding:30px}
+.modal.show{display:flex}
+.modal-content{position:relative;max-width:95vw;max-height:95vh}
+.modal-content img{max-width:100%;max-height:95vh;border-radius:10px}
+.modal-close{position:absolute;top:-40px;right:0;background:transparent;border:none;color:white;font-size:30px;cursor:pointer;line-height:1}
+.modal-download{position:absolute;bottom:-44px;left:50%;transform:translateX(-50%);font-size:13px;padding:8px 16px;background:white;color:black;border:none;border-radius:20px;cursor:pointer;font-family:inherit;font-weight:600}
+
+/* === Toast === */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#FBFAF6;padding:11px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 14px rgba(61,57,53,0.18)}
+.toast.show{opacity:1}
+
+@media(max-width:900px){
+  .main{grid-template-columns:1fr}
+  .sidebar{height:auto;position:static;border-right:none;border-bottom:1px solid var(--border)}
+  .output-col{height:auto}
+  .imggrid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- 登入 -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">爆</div>
+    <div class="login-title">爆品素材 PRO</div>
+    <div class="login-badge">PRO VERSION</div>
+    <input type="password" id="pwd-input" placeholder="輸入存取密碼" onkeydown="if(event.key==='Enter')login()"/>
+    <button class="login-btn" onclick="login()">進入</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- App -->
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark">爆</div>
+      <div>
+        <div class="topbar-title">爆品素材<span class="topbar-badge">PRO</span></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="credits-display" title="目前點數">
+        <span class="credits-icon">●</span>
+        <span class="credits-num" id="credits-num">∞</span>
+      </div>
+      <button class="topup-btn" onclick="showTopup()">儲值</button>
+      <button class="logout-btn" onclick="logout()">登出</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-label">品名 / 關鍵字</div>
+        <textarea id="keyword" rows="6" placeholder="範例：&#10;品名：PILOT 百樂可擦筆&#10;特徵：0.5mm 魔擦系列&#10;細節要求：強調可擦拭不留痕&#10;關鍵字：學生 考試 手帳"></textarea>
+        <div class="hint">字數不限。AI 會從你輸入的內容分析市場、產出影片＋圖片。</div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">參考圖（選填，最多 5 張）</div>
+        <div class="refimg-wrap" id="refimg-wrap">
+          <div class="refimg-slot" data-idx="0" onclick="pickImage(0)">
+            <span class="refimg-slot-plus">+</span>
+            <button class="refimg-slot-remove" onclick="event.stopPropagation();removeImage(0)">×</button>
+          </div>
+          <div class="refimg-slot" data-idx="1" onclick="pickImage(1)">
+            <span class="refimg-slot-plus">+</span>
+            <button class="refimg-slot-remove" onclick="event.stopPropagation();removeImage(1)">×</button>
+          </div>
+          <div class="refimg-slot" data-idx="2" onclick="pickImage(2)">
+            <span class="refimg-slot-plus">+</span>
+            <button class="refimg-slot-remove" onclick="event.stopPropagation();removeImage(2)">×</button>
+          </div>
+          <div class="refimg-slot" data-idx="3" onclick="pickImage(3)">
+            <span class="refimg-slot-plus">+</span>
+            <button class="refimg-slot-remove" onclick="event.stopPropagation();removeImage(3)">×</button>
+          </div>
+          <div class="refimg-slot" data-idx="4" onclick="pickImage(4)">
+            <span class="refimg-slot-plus">+</span>
+            <button class="refimg-slot-remove" onclick="event.stopPropagation();removeImage(4)">×</button>
+          </div>
+        </div>
+        <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleFile(event)"/>
+        <div class="hint">第 1 張會當主商品參考、其餘輔助 AI 理解商品細節。</div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">語言</div>
+        <select id="lang">
+          <option value="zh-TW" selected>繁體中文</option>
+          <option value="zh-CN">簡體中文</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+        </select>
+      </div>
+
+      <button class="gen-btn" id="gen-btn" onclick="generate()">▶ 一鍵產出全套素材</button>
+      <div class="gen-cost">本次預估：3 影片 + 8 圖 + 文案｜⏱ 約 3-5 分鐘</div>
+    </div>
+
+    <!-- Output -->
+    <div class="output-col" id="output-col">
+      <div class="empty-state">
+        <div class="empty-icon">🎬🖼📝</div>
+        <div class="empty-title">輸入品名與關鍵字，一鍵產出全套素材</div>
+        <div class="empty-sub">
+          AI 將分析市場 → 產出 3 支影片腳本（即夢 prompt 格式）<br>
+          → 8 張固定定位廣告圖（GPT Image 自動生成）<br>
+          → 平台用主標題＋hashtag＋200 字內文
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 大圖預覽 -->
+<div class="modal" id="modal" onclick="if(event.target.id==='modal')closeModal()">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <img id="modal-img" src="" alt=""/>
+    <button class="modal-download" onclick="downloadOne()">下載這張</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// 設定（階段 1 寫死、階段 2 部分改動態）
+// ============================================================
+var PWD = 'Chl97599046!';
+var GEN_WEBHOOK    = 'https://chlstore.app.n8n.cloud/webhook/gen-pro';
+var RESULT_WEBHOOK = 'https://chlstore.app.n8n.cloud/webhook/gen-pro-result';
+
+// 為階段 2 升級預留的「使用者識別」
+var CURRENT_USER = {
+  id: 'admin',           // 階段 2 改成登入後讀的 user.id
+  email: 'admin@local',
+  credits: Infinity      // 階段 2 改成從後端讀
+};
+
+// ============================================================
+// 狀態
+// ============================================================
+var refImages = [null, null, null, null, null]; // base64 data url
+var lastResult = null;
+var lastModalImg = null;
+
+// ============================================================
+// 登入
+// ============================================================
+if (sessionStorage.getItem('baopro_auth') === '1') {
+  showApp();
+}
+
+function login(){
+  var v = document.getElementById('pwd-input').value;
+  if (v === PWD) {
+    sessionStorage.setItem('baopro_auth', '1');
+    showApp();
+  } else {
+    document.getElementById('login-err').textContent = '密碼錯誤';
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
+  }
+}
+function showApp(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('show');
+  refreshCredits();
+}
+function logout(){
+  sessionStorage.clear();
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('pwd-input').value = '';
+}
+function showTopup(){
+  alert('儲值功能將在階段 2 啟用。\n如需加值請聯絡管理員。');
+}
+function refreshCredits(){
+  // 階段 1 永遠顯示 ∞
+  // 階段 2 在這裡改成 fetch supabase
+  document.getElementById('credits-num').textContent =
+    CURRENT_USER.credits === Infinity ? '∞' : String(CURRENT_USER.credits);
+}
+
+// ============================================================
+// 工具
+// ============================================================
+function showToast(msg, ms){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, ms || 2800);
+}
+function escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function copyText(text, hint){
+  navigator.clipboard.writeText(text).then(function(){
+    showToast('✓ ' + (hint || '已複製'));
+  });
+}
+
+// ============================================================
+// 參考圖上傳（自動壓縮）
+// ============================================================
+var currentPickIdx = 0;
+function pickImage(idx){
+  currentPickIdx = idx;
+  document.getElementById('file-input').click();
+}
+function handleFile(e){
+  var file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showToast('請選擇圖片檔');
+    return;
+  }
+  compressImage(file, function(dataUrl){
+    refImages[currentPickIdx] = dataUrl;
+    renderRefImages();
+  });
+  e.target.value = ''; // 允許同檔重選
+}
+function removeImage(idx){
+  refImages[idx] = null;
+  renderRefImages();
+}
+function renderRefImages(){
+  for (var i=0; i<5; i++) {
+    var slot = document.querySelector('.refimg-slot[data-idx="'+i+'"]');
+    if (refImages[i]) {
+      slot.classList.add('filled');
+      var existingImg = slot.querySelector('img');
+      if (existingImg) existingImg.remove();
+      var img = document.createElement('img');
+      img.src = refImages[i];
+      var plus = slot.querySelector('.refimg-slot-plus');
+      if (plus) plus.style.display = 'none';
+      slot.insertBefore(img, slot.firstChild);
+    } else {
+      slot.classList.remove('filled');
+      var existingImg2 = slot.querySelector('img');
+      if (existingImg2) existingImg2.remove();
+      var plus2 = slot.querySelector('.refimg-slot-plus');
+      if (plus2) plus2.style.display = '';
+    }
+  }
+}
+function compressImage(file, callback){
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var img = new Image();
+    img.onload = function(){
+      var maxSize = 1024;
+      var w = img.width, h = img.height;
+      if (w > h && w > maxSize) {
+        h = h * (maxSize / w);
+        w = maxSize;
+      } else if (h > maxSize) {
+        w = w * (maxSize / h);
+        h = maxSize;
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ============================================================
+// 主流程：產出
+// ============================================================
+async function generate(){
+  if (window.__generating) {
+    showToast('生成中，請稍候...');
+    return;
+  }
+  var keyword = document.getElementById('keyword').value.trim();
+  if (!keyword) {
+    showToast('請輸入品名與關鍵字');
+    return;
+  }
+
+  window.__generating = true;
+  var btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 生成中...';
+
+  var refImgsFiltered = refImages.filter(function(x){return x;});
+  var payload = {
+    userId: CURRENT_USER.id,
+    mode: 'pro',
+    lang: document.getElementById('lang').value,
+    keyword: keyword,
+    refImages: refImgsFiltered
+  };
+
+  renderProgress({
+    title: '正在啟動...',
+    step: '送出請求',
+    elapsed: 0,
+    percent: 1
+  });
+  var startTime = Date.now();
+  var elapsedTimer = setInterval(function(){
+    var ds = document.getElementById('progress-elapsed-display');
+    if (ds) {
+      var sec = Math.floor((Date.now() - startTime)/1000);
+      ds.textContent = sec + 's';
+    }
+  }, 500);
+
+  try {
+    // 1. 啟動 job
+    var startRes = await fetch(GEN_WEBHOOK, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if (!startRes.ok) throw new Error('啟動失敗 HTTP ' + startRes.status);
+    var startData = await startRes.json();
+
+    var jobId = startData.jobId || startData.job_id;
+    if (!jobId) throw new Error('回應無 jobId：' + JSON.stringify(startData).slice(0,200));
+
+    renderProgress({
+      title: 'AI 正在分析市場與生成素材',
+      step: '已收到工作 ID：' + jobId.slice(-8),
+      elapsed: Math.floor((Date.now()-startTime)/1000),
+      percent: 3
+    });
+
+    // 2. 輪詢結果（最多 10 分鐘）
+    var maxTries = 120; // 每 5 秒一次
+    for (var i=0; i<maxTries; i++) {
+      await new Promise(function(r){setTimeout(r, 5000);});
+
+      var pollRes;
+      try {
+        pollRes = await fetch(RESULT_WEBHOOK + '?jobId=' + encodeURIComponent(jobId), {method:'GET'});
+      } catch(e) {
+        continue; // 單次失敗繼續
+      }
+      if (!pollRes.ok) continue;
+
+      var pollData;
+      try { pollData = await pollRes.json(); } catch(e) { continue; }
+
+      // 進度更新
+      if (pollData.progress) {
+        renderProgress({
+          title: 'AI 正在分析市場與生成素材',
+          step: pollData.progress.step || '處理中...',
+          elapsed: Math.floor((Date.now()-startTime)/1000),
+          percent: pollData.progress.percent || (3 + i*0.7)
+        });
+      } else {
+        renderProgress({
+          title: 'AI 正在分析市場與生成素材',
+          step: '處理中... (' + (i+1)*5 + 's)',
+          elapsed: Math.floor((Date.now()-startTime)/1000),
+          percent: Math.min(95, 3 + i*0.7)
+        });
+      }
+
+      if (pollData.status === 'done') {
+        clearInterval(elapsedTimer);
+        lastResult = pollData.data || pollData;
+        renderResult(lastResult);
+        showToast('✓ 全套素材已產出！');
+        break;
+      }
+      if (pollData.status === 'error' || pollData.status === 'failed') {
+        throw new Error(pollData.error || pollData.error_message || '後端回報失敗');
+      }
+    }
+
+    if (!lastResult) {
+      throw new Error('等待逾時（10 分鐘）— 請檢查 n8n executions');
+    }
+  } catch(e) {
+    clearInterval(elapsedTimer);
+    document.getElementById('output-col').innerHTML =
+      '<div style="padding:60px 20px;text-align:center;">' +
+      '<div style="font-size:36px;margin-bottom:14px;">❌</div>' +
+      '<div style="font-size:15px;color:var(--danger);margin-bottom:8px;font-weight:600;">生成失敗</div>' +
+      '<div style="font-size:13px;color:var(--text2);max-width:500px;margin:0 auto;line-height:1.7;">' + escHtml(e.message) + '</div>' +
+      '</div>';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '▶ 一鍵產出全套素材';
+  window.__generating = false;
+}
+
+function renderProgress(opts){
+  var col = document.getElementById('output-col');
+  var elapsed = opts.elapsed || 0;
+  col.innerHTML =
+    '<div class="progress-state">' +
+      '<div class="progress-spinner"></div>' +
+      '<div class="progress-title">' + escHtml(opts.title) + '</div>' +
+      '<div class="progress-step">' + escHtml(opts.step) + '</div>' +
+      '<div class="progress-bar"><div class="progress-fill" style="width:'+opts.percent+'%"></div></div>' +
+      '<div class="progress-elapsed">已等候 <span id="progress-elapsed-display">'+elapsed+'s</span></div>' +
+    '</div>';
+}
+
+// ============================================================
+// 渲染結果
+// ============================================================
+function getField(obj, names){
+  for (var i=0; i<names.length; i++) {
+    var v = obj[names[i]];
+    if (v !== undefined && v !== null && v !== '') return v;
+  }
+  return '';
+}
+
+function renderResult(data){
+  var col = document.getElementById('output-col');
+  var now = new Date();
+  var ds = now.getFullYear()+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+String(now.getDate()).padStart(2,'0');
+
+  var html = '<div class="result-header">' +
+    '<div><div class="result-title">🔥 完整素材包</div>' +
+    '<div class="result-meta">' + ds + ' · job ' + (data.jobId || data.job_id || '').slice(-8) + '</div></div>' +
+    '<button class="zip-btn" onclick="downloadZip()">⬇ 下載 ZIP（全部）</button>' +
+  '</div>';
+
+  // === 1. 商品分析摘要 ===
+  if (data.product_summary || data.story_core) {
+    var ps = data.product_summary || data.story_core || {};
+    html += '<div class="r-section">' +
+      '<div class="r-section-head"><div class="r-section-title"><span class="r-section-icon">🎯</span>商品定位與故事核心</div></div>' +
+      '<div class="r-section-body"><div class="summary-grid">';
+    var items = [
+      ['品名',         getField(ps, ['product','name','product_name'])],
+      ['品類定位',     getField(ps, ['category','positioning'])],
+      ['目標客群',     getField(ps, ['target_audience','audience'])],
+      ['核心痛點',     getField(ps, ['pain_point','main_pain_point','pain'])],
+      ['核心爽點',     getField(ps, ['joy_point','joy_points','benefit'])],
+      ['差異化',       getField(ps, ['differentiation','unique_value'])],
+      ['視覺調性',     getField(ps, ['visual_tone','tone','style'])],
+      ['故事核心',     getField(ps, ['story_core','story','core_message'])],
+      ['市場洞察',     getField(ps, ['market_insight','insight'])]
+    ];
+    for (var i=0;i<items.length;i++) {
+      var label = items[i][0], val = items[i][1];
+      if (val) {
+        var displayVal = Array.isArray(val) ? val.join('、') : String(val);
+        html += '<div class="summary-item"><div class="summary-item-label">'+label+'</div><div class="summary-item-value">'+escHtml(displayVal)+'</div></div>';
+      }
+    }
+    html += '</div></div></div>';
+  }
+
+  // === 2. 影片腳本（3 支）===
+  if (data.video_scripts && data.video_scripts.length) {
+    html += '<div class="r-section">' +
+      '<div class="r-section-head"><div class="r-section-title"><span class="r-section-icon">🎬</span>影片腳本（3 支 · 即夢用）</div>' +
+      '<button class="r-section-copy" onclick="copyAllVideos()">複製全部</button></div>' +
+      '<div class="r-section-body">';
+    for (var v=0; v<data.video_scripts.length; v++) {
+      var vs = data.video_scripts[v];
+      html += '<div class="video-script">' +
+        '<div class="video-script-head">' +
+          '<div class="video-script-title">影片 ' + (v+1) + '：' + escHtml(getField(vs,['title','suggested_title','script_type'])) + '</div>' +
+          '<button class="r-section-copy" onclick="copyOneVideo(' + v + ')">複製此支</button>' +
+        '</div>';
+      var infoFields = [
+        ['策略',     ['strategy','approach']],
+        ['核心痛點', ['pain_point','main_pain_point']],
+        ['開場鉤子', ['hook','opening']],
+        ['CTA',     ['cta','call_to_action']],
+        ['建議標題', ['suggested_title','title_suggestion']]
+      ];
+      for (var f=0;f<infoFields.length;f++) {
+        var val = getField(vs, infoFields[f][1]);
+        if (val) {
+          html += '<div class="video-info-row"><b>'+infoFields[f][0]+'：</b>'+escHtml(Array.isArray(val)?val.join('、'):String(val))+'</div>';
+        }
+      }
+      var scenes = vs.scenes || vs.timeline || vs.storyboard || [];
+      if (scenes.length) {
+        html += '<div class="scene-list">';
+        for (var j=0;j<scenes.length;j++) {
+          var sc = scenes[j];
+          var t  = getField(sc, ['time','time_range','duration']);
+          var act= getField(sc, ['action','description']);
+          var vo = getField(sc, ['voiceover','voice_over','narration']);
+          var sub= getField(sc, ['subtitle','script','onscreen_text']);
+          var mat= getField(sc, ['material','b_roll']);
+          var jp = getField(sc, ['jimeng_prompt','prompt','video_prompt']);
+          html += '<div class="scene-card">' +
+            '<div class="scene-card-title"><span class="scene-time">' + escHtml(String(t)) + '</span>分鏡 ' + (j+1) + (act?'：'+escHtml(String(act)):'') + '</div>';
+          if (vo)  html += '<div class="scene-field"><b>旁白：</b>'+escHtml(String(vo))+'</div>';
+          if (sub) html += '<div class="scene-field"><b>字幕：</b>'+escHtml(String(sub))+'</div>';
+          if (mat) html += '<div class="scene-field"><b>素材：</b>'+escHtml(String(mat))+'</div>';
+          if (jp)  html += '<div class="jimeng-prompt">' +
+            '<button class="jimeng-copy" onclick="copyText(\''+escapeJs(String(jp))+'\',\'已複製即夢 prompt\')">複製</button>' +
+            '🎬 即夢 prompt：\n' + escHtml(String(jp)) + '</div>';
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div></div>';
+  }
+
+  // === 3. 圖片 8 張 ===
+  if (data.images && data.images.length) {
+    html += '<div class="r-section">' +
+      '<div class="r-section-head"><div class="r-section-title"><span class="r-section-icon">🖼</span>廣告圖（8 張 · GPT Image 自動生成）</div></div>' +
+      '<div class="r-section-body"><div class="imggrid">';
+    var POSITIONS = ['首圖A痛點對比','首圖B高質感情境','首圖C促銷爆品','賣點圖1核心功能','賣點圖2材質細節','情境圖生活場景','尺寸規格圖','信任圖評價熱銷'];
+    for (var k=0; k<8; k++) {
+      var img = data.images[k] || {};
+      var pos = img.position || POSITIONS[k];
+      html += '<div class="imgcell" onclick="openModal('+k+')">';
+      if (img.image_base64 || img.url || img.image_url) {
+        var src = img.image_base64
+          ? ('data:image/png;base64,' + img.image_base64)
+          : (img.url || img.image_url);
+        html += '<img src="'+src+'" alt="'+escHtml(pos)+'" data-pos="'+escHtml(pos)+'"/>';
+      } else if (img.error) {
+        html += '<div class="imgcell-error">❌<br>'+escHtml(img.error)+'</div>';
+      } else {
+        html += '<div class="imgcell-loading"><div class="progress-spinner"></div>生成中...</div>';
+      }
+      html += '<div class="imgcell-num">'+(k+1)+'</div>';
+      html += '<div class="imgcell-label">'+escHtml(pos)+'</div>';
+      html += '</div>';
+    }
+    html += '</div></div></div>';
+  }
+
+  // === 4. 平台用文案 ===
+  if (data.platform_text) {
+    var pt = data.platform_text;
+    html += '<div class="r-section">' +
+      '<div class="r-section-head"><div class="r-section-title"><span class="r-section-icon">📝</span>平台用文案</div>' +
+      '<button class="r-section-copy" onclick="copyAllText()">複製全部</button></div>' +
+      '<div class="r-section-body">';
+    if (pt.titles && pt.titles.length) {
+      html += '<div class="text-block"><div class="text-block-title">主標題（3 個）</div>';
+      for (var t=0; t<pt.titles.length; t++) {
+        html += '<div class="text-block-content" style="margin:6px 0;font-weight:500;">' + (t+1) + '. ' + escHtml(String(pt.titles[t])) + '</div>';
+      }
+      html += '</div>';
+    }
+    if (pt.hashtags && pt.hashtags.length) {
+      html += '<div class="text-block"><div class="text-block-title">Hashtag（' + pt.hashtags.length + ' 個）</div><div class="tag-list">';
+      for (var h=0; h<pt.hashtags.length; h++) {
+        var tag = String(pt.hashtags[h]).replace(/^#?/, '#');
+        html += '<span class="tag-pill">'+escHtml(tag)+'</span>';
+      }
+      html += '</div></div>';
+    }
+    if (pt.body || pt.content || pt.post_text) {
+      html += '<div class="text-block"><div class="text-block-title">內文（建議貼到 FB / IG / 小紅書）</div>' +
+        '<div class="text-block-content">' + escHtml(String(pt.body || pt.content || pt.post_text)) + '</div></div>';
+    }
+    html += '</div></div>';
+  }
+
+  col.innerHTML = html;
+}
+
+function escapeJs(s){
+  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n').replace(/\r/g,'');
+}
+
+// ============================================================
+// 複製功能
+// ============================================================
+function copyOneVideo(idx){
+  if (!lastResult || !lastResult.video_scripts || !lastResult.video_scripts[idx]) return;
+  var vs = lastResult.video_scripts[idx];
+  var lines = ['【影片 '+(idx+1)+'：'+getField(vs,['title','suggested_title','script_type'])+'】'];
+  var infoFields = [
+    ['策略',     ['strategy','approach']],
+    ['核心痛點', ['pain_point','main_pain_point']],
+    ['開場鉤子', ['hook','opening']],
+    ['CTA',     ['cta','call_to_action']]
+  ];
+  for (var f=0;f<infoFields.length;f++) {
+    var val = getField(vs, infoFields[f][1]);
+    if (val) lines.push(infoFields[f][0]+'：'+(Array.isArray(val)?val.join('、'):String(val)));
+  }
+  var scenes = vs.scenes || vs.timeline || vs.storyboard || [];
+  scenes.forEach(function(sc,j){
+    lines.push('');
+    lines.push('分鏡 '+(j+1)+(getField(sc,['time','time_range','duration'])?'｜'+getField(sc,['time','time_range','duration']):'')+(getField(sc,['action'])?'｜'+getField(sc,['action']):''));
+    if (getField(sc,['jimeng_prompt','prompt'])) lines.push('🎬 即夢 prompt：'+getField(sc,['jimeng_prompt','prompt']));
+    if (getField(sc,['voiceover','voice_over','narration'])) lines.push('旁白：'+getField(sc,['voiceover','voice_over','narration']));
+    if (getField(sc,['subtitle','script'])) lines.push('字幕：'+getField(sc,['subtitle','script']));
+    if (getField(sc,['material'])) lines.push('素材：'+getField(sc,['material']));
+  });
+  copyText(lines.join('\n'), '已複製影片 '+(idx+1));
+}
+function copyAllVideos(){
+  if (!lastResult || !lastResult.video_scripts) return;
+  var all = lastResult.video_scripts.map(function(vs,i){
+    var lines = ['━━━━━ 影片 '+(i+1)+' ━━━━━'];
+    var fields = [['策略',['strategy']],['核心痛點',['pain_point','main_pain_point']],['開場鉤子',['hook']],['CTA',['cta']]];
+    for (var f=0;f<fields.length;f++) {
+      var v = getField(vs, fields[f][1]);
+      if (v) lines.push(fields[f][0]+'：'+(Array.isArray(v)?v.join('、'):String(v)));
+    }
+    var scenes = vs.scenes || vs.timeline || vs.storyboard || [];
+    scenes.forEach(function(sc,j){
+      lines.push('');
+      lines.push('分鏡 '+(j+1)+(getField(sc,['time'])?'｜'+getField(sc,['time']):''));
+      if (getField(sc,['jimeng_prompt','prompt'])) lines.push('🎬 即夢 prompt：'+getField(sc,['jimeng_prompt','prompt']));
+      if (getField(sc,['voiceover','narration'])) lines.push('旁白：'+getField(sc,['voiceover','narration']));
+      if (getField(sc,['subtitle','script'])) lines.push('字幕：'+getField(sc,['subtitle','script']));
+      if (getField(sc,['material'])) lines.push('素材：'+getField(sc,['material']));
+    });
+    return lines.join('\n');
+  }).join('\n\n');
+  copyText(all, '已複製全部影片腳本');
+}
+function copyAllText(){
+  if (!lastResult || !lastResult.platform_text) return;
+  var pt = lastResult.platform_text;
+  var lines = [];
+  if (pt.titles) { lines.push('【主標題】'); pt.titles.forEach(function(t,i){lines.push((i+1)+'. '+t);}); lines.push(''); }
+  if (pt.hashtags) { lines.push('【Hashtag】'); lines.push(pt.hashtags.map(function(t){return String(t).replace(/^#?/,'#');}).join(' ')); lines.push(''); }
+  if (pt.body || pt.content || pt.post_text) { lines.push('【內文】'); lines.push(String(pt.body||pt.content||pt.post_text)); }
+  copyText(lines.join('\n'), '已複製全部文案');
+}
+
+// ============================================================
+// 大圖預覽
+// ============================================================
+function openModal(idx){
+  if (!lastResult || !lastResult.images || !lastResult.images[idx]) return;
+  var img = lastResult.images[idx];
+  var src = img.image_base64 ? ('data:image/png;base64,'+img.image_base64) : (img.url || img.image_url);
+  if (!src) return;
+  lastModalImg = { src: src, idx: idx, position: img.position || ('image_'+(idx+1)) };
+  document.getElementById('modal-img').src = src;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('show');
+}
+function downloadOne(){
+  if (!lastModalImg) return;
+  var a = document.createElement('a');
+  a.href = lastModalImg.src;
+  a.download = String(lastModalImg.idx+1).padStart(2,'0') + '_' + safeFilename(lastModalImg.position) + '.png';
+  a.click();
+}
+function safeFilename(s){
+  return String(s||'').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,40);
+}
+
+// ============================================================
+// ZIP 打包下載
+// ============================================================
+async function downloadZip(){
+  if (!lastResult) return;
+  showToast('打包 ZIP 中...');
+
+  var zip = new JSZip();
+  var kw = document.getElementById('keyword').value.trim().split('\n')[0].replace(/[^一-龥a-zA-Z0-9]/g,'').slice(0,15) || 'baopin';
+  var ds = new Date().toISOString().slice(0,10);
+
+  // 圖片
+  if (lastResult.images && lastResult.images.length) {
+    var imgFolder = zip.folder('圖片');
+    for (var i=0; i<lastResult.images.length; i++) {
+      var img = lastResult.images[i];
+      if (img.image_base64) {
+        imgFolder.file(
+          String(i+1).padStart(2,'0') + '_' + safeFilename(img.position||('image_'+(i+1))) + '.png',
+          img.image_base64,
+          {base64:true}
+        );
+      } else if (img.url || img.image_url) {
+        try {
+          var resp = await fetch(img.url || img.image_url);
+          var blob = await resp.blob();
+          imgFolder.file(
+            String(i+1).padStart(2,'0') + '_' + safeFilename(img.position||('image_'+(i+1))) + '.png',
+            blob
+          );
+        } catch(e) {
+          console.warn('下載第 '+i+' 張圖失敗：', e);
+        }
+      }
+    }
+  }
+
+  // 影片腳本 txt
+  if (lastResult.video_scripts && lastResult.video_scripts.length) {
+    var videoTxt = lastResult.video_scripts.map(function(vs,i){
+      var lines = ['━━━━━ 影片 '+(i+1)+' ━━━━━'];
+      var fields = [['策略',['strategy']],['核心痛點',['pain_point','main_pain_point']],['開場鉤子',['hook']],['CTA',['cta']],['建議標題',['suggested_title']]];
+      for (var f=0;f<fields.length;f++) {
+        var v = getField(vs, fields[f][1]);
+        if (v) lines.push(fields[f][0]+'：'+(Array.isArray(v)?v.join('、'):String(v)));
+      }
+      var scenes = vs.scenes || vs.timeline || vs.storyboard || [];
+      scenes.forEach(function(sc,j){
+        lines.push('');
+        lines.push('分鏡 '+(j+1)+(getField(sc,['time'])?'｜'+getField(sc,['time']):''));
+        if (getField(sc,['jimeng_prompt','prompt'])) lines.push('🎬 即夢 prompt：'+getField(sc,['jimeng_prompt','prompt']));
+        if (getField(sc,['voiceover','narration'])) lines.push('旁白：'+getField(sc,['voiceover','narration']));
+        if (getField(sc,['subtitle','script'])) lines.push('字幕：'+getField(sc,['subtitle','script']));
+        if (getField(sc,['material'])) lines.push('素材：'+getField(sc,['material']));
+      });
+      return lines.join('\n');
+    }).join('\n\n\n');
+    zip.file('影片腳本_即夢用.txt', videoTxt);
+  }
+
+  // 文案 txt
+  if (lastResult.platform_text) {
+    var pt = lastResult.platform_text;
+    var lines = [];
+    if (pt.titles) { lines.push('【主標題】'); pt.titles.forEach(function(t,i){lines.push((i+1)+'. '+t);}); lines.push(''); }
+    if (pt.hashtags) { lines.push('【Hashtag】'); lines.push(pt.hashtags.map(function(t){return String(t).replace(/^#?/,'#');}).join(' ')); lines.push(''); }
+    if (pt.body || pt.content || pt.post_text) { lines.push('【內文】'); lines.push(String(pt.body||pt.content||pt.post_text)); }
+    zip.file('平台文案.txt', lines.join('\n'));
+  }
+
+  // 商品分析
+  if (lastResult.product_summary || lastResult.story_core) {
+    zip.file('商品分析.json', JSON.stringify(lastResult.product_summary || lastResult.story_core, null, 2));
+  }
+
+  // 全資料 backup
+  zip.file('_full_result.json', JSON.stringify(lastResult, null, 2));
+
+  var blob = await zip.generateAsync({type:'blob', compression:'DEFLATE'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = '爆品素材_' + kw + '_' + ds + '.zip';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ ZIP 已下載');
+}
+
+// ============================================================
+// 鍵盤快捷鍵
+// ============================================================
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
